@@ -32,7 +32,7 @@ function Navbar() {
 
   const menuItems = [
     { name: "Home", href: "/" },
-    { name: "Marketplace", href: "/marketplace" },
+    { name: "Marketplace", href: "/market" },
     { name: "About", href: "/about" },
     { name: "Support", href: "/support" },
   ];
@@ -114,7 +114,9 @@ function Navbar() {
           </div>
         </motion.div>
       </div>
+      
     </motion.nav>
+    
   );
 }
 
