@@ -6,29 +6,19 @@ import {
   SignedOut,
   useUser,
 } from "@clerk/clerk-react";
-
+import Navbar from "./Components/Navbar";
+import Footer from "./Components/Footer";
+import Home from "./Pages/Home";
 function App() {
   const { isSignedIn } = useUser();
 
+
   return (
     <div>
-      <h1>Welcome to My App</h1>
-      {isSignedIn ? (
-        <div>
-          <p>You are signed in!</p>
-          <UserButton />
-        </div>
-      ) : (
-        <div>
-          <SignedOut>
-            <SignIn />
-          </SignedOut>
-          <SignedIn>
-            <p>You are signed in!</p>
-            <UserButton />
-          </SignedIn>
-        </div>
-      )}
+      {/* <h1>Welcome to My App</h1> */}
+      <Navbar />
+      <Home />
+      <Footer />
     </div>
   );
 }
