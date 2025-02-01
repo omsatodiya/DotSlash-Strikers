@@ -30,6 +30,6 @@ const hospitalSchema = new mongoose.Schema({
 
 hospitalSchema.index({ location: "2dsphere" });
 
-const Hopsital = mongoose.model("Hospital", hospitalSchema);
+const Hospital = mongoose.model("Hospital", hospitalSchema);
 
-export default Hopsital;
+export default Hospital;
