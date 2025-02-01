@@ -1,10 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
-import itemRoutes from "./routes/items.route.js";
-import cors from "cors";
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
-import { config } from "dotenv";
+import HospitalRoutes from "./routes/hospital.route.js";
+import ItemRoutes from "./routes/items.route.js";
 
 dotenv.config();
 
@@ -27,8 +25,9 @@ app.use(
   })
 );
 
-// Routes
-app.use("/api/items", itemRoutes);
+app.use("/api/hospital", HospitalRoutes);
+
+app.use("/api/item", ItemRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running!");
