@@ -14,7 +14,6 @@ import { Route , Routes , BrowserRouter } from "react-router-dom";
 function App() {
   const { isSignedIn } = useUser();
 
-
   return (
     <div>
       <Navbar />

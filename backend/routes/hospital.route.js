@@ -1,25 +1,24 @@
 import express from "express";
-import Hopsital from "../models/hospital.js";
+import Hospital from "../models/hospital.js";
 import mongoose from "mongoose";
 import {
   createHospital,
   deleteHospital,
   getHospitals,
   updateHospital,
+  getHospitalById,
 } from "../controller/hosptial.controller.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.send("reached get");
-});
+router.get("/", getHospitals);
 
-router.get("/hospital", getHospitals);
+router.get("/:id", getHospitalById);
 
-router.post("/hospital", createHospital);
+router.post("/", createHospital);
 
-router.put("/hospital/:id", updateHospital);
+router.put("/:id", updateHospital);
 
-router.delete("/hospital/:id", deleteHospital);
+router.delete("/:id", deleteHospital);
 
 export default router;
