@@ -10,8 +10,9 @@ import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import Home from "./Pages/Home";
 import Market from "./Pages/Market";
-import { useState, useEffect } from "react";
-import { Route , Routes , BrowserRouter } from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
+import Dashboard from "./Pages/Dashboard";
+import HospitalRegistrationForm from "./Components/HospitalForm";
 function App() {
   const { isSignedIn } = useUser();
 
@@ -20,10 +21,10 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-      fetch("http://localhost:5500/api/hospital")
+    fetch("http://localhost:5500/api/hospital")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("network response wasn't ok")
+          throw new Error("network response wasn't ok");
         }
         // console.log(response);
         return response.json();
@@ -36,19 +37,15 @@ function App() {
         setError(error.message);
         setLoading(false);
       });
-    }, []);
+  }, []);
 
-    if(loading) {
-      return <>
-      loading
-      </>
-    }
-  
-    if(error) {
-      return <>
-      loading
-      </>
-    }
+  if (loading) {
+    return <>loading</>;
+  }
+
+  if (error) {
+    return <>loading</>;
+  }
 
   return (
     <div>
@@ -57,10 +54,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/market" element={<Market />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/hospital-form" element={<HospitalRegistrationForm />} />
       </Routes>
-      <Footer/>
+      <Footer />
       {/* <h1>Welcome to My App</h1> */}
-
     </div>
   );
 }

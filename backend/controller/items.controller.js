@@ -75,7 +75,8 @@ export const getItemById = async (req, res) => {
 
 // create item
 export const createItem = async (req, res) => {
-  const { name, quantity, expiryDate, category, hospitalId } = req.body;
+  const { name, quantity, expiryDate, category, hospitalId, imageURL, price } =
+    req.body;
 
   try {
     const newItem = new Item({
@@ -84,6 +85,8 @@ export const createItem = async (req, res) => {
       expiryDate,
       category,
       hospitalId,
+      imageURL,
+      price,
     });
     await newItem.save();
     res
@@ -130,17 +133,14 @@ export const deleteItem = async (req, res) => {
   }
 };
 
-// Add a new item
 export const addItem = async (req, res) => {
   const { name, quantity, expiryDate, category, hospitalId } = req.body;
 
   try {
-    // Validate required fields
     if (!name || !quantity || !expiryDate || !category || !hospitalId) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    // Create a new item
     const newItem = new Item({
       name,
       quantity,
@@ -149,10 +149,8 @@ export const addItem = async (req, res) => {
       hospitalId,
     });
 
-    // Save the item to the database
     await newItem.save();
 
-    // Respond with the created item
     res.status(201).json({ message: "Item added successfully", item: newItem });
   } catch (err) {
     res.status(500).json({ error: "Error adding item" });

@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import { motion, useScroll, useAnimation } from "framer-motion";
 import { HeartPulse, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { SignedIn, SignInButton, SignedOut, UserButton } from "@clerk/clerk-react";
+import {
+  SignedIn,
+  SignUpButton,
+  SignedOut,
+  UserButton,
+} from "@clerk/clerk-react";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,12 +70,12 @@ function Navbar() {
             ))}
 
             <SignedOut>
-              <SignInButton className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors" />
+              <SignUpButton className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors" />
             </SignedOut>
-            
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
+
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </div>
 
           {/* Mobile Menu Button */}
@@ -104,8 +109,8 @@ function Navbar() {
                 {item.name}
               </Link>
             ))}
-            <Link 
-              to="/signin" 
+            <Link
+              to="/signin"
               className="block w-full px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md text-center transition-colors"
               onClick={() => setIsOpen(false)}
             >
@@ -114,9 +119,7 @@ function Navbar() {
           </div>
         </motion.div>
       </div>
-      
     </motion.nav>
-    
   );
 }
 
