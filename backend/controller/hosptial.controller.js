@@ -1,61 +1,82 @@
 import Hopsital from "../models/hospital.js";
 import mongoose from "mongoose";
+import { clerkClient } from "@clerk/express"; // Use the correct import
 
 export const getHospitals = async (req, res) => {
-    try {
-        const hopsitals = await Hopsital.find({});
-        res.status(200).json({success: true, data: hopsitals});
-    } catch (error) {
-        console.log("error" + error.message);
-    }
-}
+  try {
+    const hospitals = await Hopsital.find({});
+    res.status(200).json({ success: true, data: hospitals });
+  } catch (error) {
+    console.log("error: " + error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
 export const createHospital = async (req, res) => {
-    const hospital = req.body;
-    
-    if(!hospital.name || !hospital.email || !hospital.password || !hospital.contact)
-    {
-        return res.send(400).json({success: false, message: "fill everything"});
-    }
-    const newHospital = new Hopsital(hospital);
-    try {
-        await newHospital.save();
-        res.status(201).json({ success: true, data: newHospital});
-    } catch (error) {
-        console.log("error: " + error.message);
-        res.status(500).json({success: false, message: "server error"});
-    }
-}
+  const hospital = req.body;
+
+  if (
+    !hospital.name ||
+    !hospital.email ||
+    !hospital.password ||
+    !hospital.contact
+  ) {
+    return res.status(400).json({ success: false, message: "Fill all fields" });
+  }
+
+  const newHospital = new Hopsital(hospital);
+  try {
+    await newHospital.save();
+    res.status(201).json({ success: true, data: newHospital });
+  } catch (error) {
+    console.log("error: " + error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
 export const updateHospital = async (req, res) => {
-    const {id} = req.params;
-    const hospital = req.body;
+  const { id } = req.params;
+  const { userId } = req.body;
 
-    if(!mongoose.Types.ObjectId.isValid(id))
-    {
-        return res.status(404).json({success: false, message: "invalid hosptial"})
-    }
-    // here email has to unique so if after editing current email it puts it to an existing one, server error will be catched below 
-    try {
-        const updatedHospital = await Hopsital.findByIdAndUpdate(id, hospital, {new: true});
-        res.status(200).json({success: true, data: updatedHospital});
-    } catch (error) {
-        console.log("error " + error.message);
-        res.status(500).json({success: false, message: "server error"});
-    }
-}
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Invalid hospital ID" });
+  }
+
+  try {
+    // Fetch the Clerk user
+    const clerkUser = await clerkClient.users.getUser(userId);
+    console.log("Clerk User:", clerkUser);
+
+    // Update the hospital with the Clerk user data (if needed)
+    const updatedHospital = await Hopsital.findByIdAndUpdate(
+      id,
+      { ...req.body, clerkUserId: userId }, // Optionally store the Clerk user ID
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, data: updatedHospital });
+  } catch (error) {
+    console.log("error: " + error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
 export const deleteHospital = async (req, res) => {
-    const {id} = req.params;
-    if(!mongoose.Types.ObjectId.isValid(id))
-    {
-        return res.status(404).json({success: false, message: "invalid hosptial"})
-    }
-    try {
-        await Hopsital.findByIdAndDelete(id);
-        res.status(200).json({success: true, message: "hospital deleted"});
-    } catch (error) {
-        res.status(500).json({success: false, message: "server error"});
-        console.log("error" + error.message);
-    }
-}
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Invalid hospital ID" });
+  }
+
+  try {
+    await Hopsital.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: "Hospital deleted" });
+  } catch (error) {
+    console.log("error: " + error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

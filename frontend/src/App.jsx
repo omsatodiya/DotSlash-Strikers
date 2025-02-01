@@ -15,7 +15,7 @@ function App() {
       <h1>Welcome to My App</h1>
       {isSignedIn ? (
         <div>
-          <p>You are signed in!</p>
+          <p className="">You are signed in!</p>
           <UserButton />
         </div>
       ) : (
