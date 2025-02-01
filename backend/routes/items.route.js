@@ -5,7 +5,7 @@ import {
   getItemById,
   updateItem,
   deleteItem,
-} from "../controllers/items.controller.js";
+} from "../controller/items.controller.js";
 
 const router = express.Router();
 

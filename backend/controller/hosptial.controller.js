@@ -1,10 +1,10 @@
-import Hopsital from "../models/hospital.js";
+import Hospital from "../models/hospital.js";
 import mongoose from "mongoose";
 import { clerkClient } from "@clerk/express"; // Use the correct import
 
 export const getHospitals = async (req, res) => {
   try {
-    const hospitals = await Hopsital.find({});
+    const hospitals = await Hospital.find({});
     res.status(200).json({ success: true, data: hospitals });
   } catch (error) {
     console.log("error: " + error.message);
@@ -24,7 +24,7 @@ export const createHospital = async (req, res) => {
     return res.status(400).json({ success: false, message: "Fill all fields" });
   }
 
-  const newHospital = new Hopsital(hospital);
+  const newHospital = new Hospital(hospital);
   try {
     await newHospital.save();
     res.status(201).json({ success: true, data: newHospital });
@@ -50,7 +50,7 @@ export const updateHospital = async (req, res) => {
     console.log("Clerk User:", clerkUser);
 
     // Update the hospital with the Clerk user data (if needed)
-    const updatedHospital = await Hopsital.findByIdAndUpdate(
+    const updatedHospital = await Hospital.findByIdAndUpdate(
       id,
       { ...req.body, clerkUserId: userId }, // Optionally store the Clerk user ID
       { new: true }
@@ -73,7 +73,7 @@ export const deleteHospital = async (req, res) => {
   }
 
   try {
-    await Hopsital.findByIdAndDelete(id);
+    await Hospital.findByIdAndDelete(id);
     res.status(200).json({ success: true, message: "Hospital deleted" });
   } catch (error) {
     console.log("error: " + error.message);

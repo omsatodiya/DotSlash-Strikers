@@ -1,5 +1,5 @@
 import express from "express";
-import Hopsital from "../models/hospital.js";
+import Hospital from "../models/hospital.js";
 import mongoose from "mongoose";
 import {
   createHospital,
@@ -10,16 +10,12 @@ import {
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.send("reached get");
-});
+router.get("/", getHospitals);
 
-router.get("/hospital", getHospitals);
+router.post("/", createHospital);
 
-router.post("/hospital", createHospital);
+router.put("/:id", updateHospital);
 
-router.put("/hospital/:id", updateHospital);
-
-router.delete("/hospital/:id", deleteHospital);
+router.delete("/:id", deleteHospital);
 
 export default router;
