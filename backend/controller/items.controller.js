@@ -5,7 +5,7 @@ import items from "../models/items.js";
 
 export const authorizeHospital = async (req, res, next) => {
   const { id } = req.params;
-  const hospitalId = req.user.id;
+  const hospitalId = req.body.hospitalId;
 
   try {
     const item = await Item.findById(id);
@@ -73,20 +73,40 @@ export const getItemById = async (req, res) => {
   }
 };
 
+// create item
+export const createItem = async (req, res) => {
+  const { name, quantity, expiryDate, category, hospitalId } = req.body;
+
+  try {
+    const newItem = new Item({
+      name,
+      quantity,
+      expiryDate,
+      category,
+      hospitalId,
+    });
+    await newItem.save();
+    res
+      .status(201)
+      .json({ message: "Item created successfully", item: newItem });
+  } catch (err) {
+    res.status(500).json({ error: "Error creating item" });
+  }
+};
+
 export const updateItem = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const item = req.body;
-  if(!mongoose.Types.ObjectId.isValid(id))
-  {
-    return res.status(404).json({success: false, message: "invalid item"});
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ success: false, message: "invalid item" });
   }
 
   try {
-    const updatedItem = await items.findByIdAndUpdate(id, item, {new: true});
-    res.status(200).json({success: true, data: updateItem})
+    const updatedItem = await items.findByIdAndUpdate(id, item, { new: true });
+    res.status(200).json({ success: true, data: updateItem });
   } catch (error) {
     console.log("error " + error.message);
-    res.status(500).json({success: false, message: "server error"});
+    res.status(500).json({ success: false, message: "server error" });
   }
   // try {
   //   const { name, quantity, expiryDate, category, status } = req.body;

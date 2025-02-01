@@ -6,11 +6,14 @@ import {
   deleteHospital,
   getHospitals,
   updateHospital,
+  getHospitalById,
 } from "../controller/hosptial.controller.js";
 
 const router = express.Router();
 
 router.get("/", getHospitals);
+
+router.get("/:id", getHospitalById);
 
 router.post("/", createHospital);
 

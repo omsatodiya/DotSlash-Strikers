@@ -1,6 +1,5 @@
 import Hospital from "../models/hospital.js";
 import mongoose from "mongoose";
-import { clerkClient } from "@clerk/express"; // Use the correct import
 
 export const getHospitals = async (req, res) => {
   try {
@@ -34,6 +33,20 @@ export const createHospital = async (req, res) => {
   }
 };
 
+// get hospital by id
+export const getHospitalById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const hospital = await Hospital.findById(id);
+    res.status(200).json({ success: true, data: hospital });
+  } catch (error) {
+    console.log("error: " + error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ... existing code ...
+
 export const updateHospital = async (req, res) => {
   const { id } = req.params;
   const { userId } = req.body;
@@ -45,23 +58,44 @@ export const updateHospital = async (req, res) => {
   }
 
   try {
-    // Fetch the Clerk user
-    const clerkUser = await clerkClient.users.getUser(userId);
-    console.log("Clerk User:", clerkUser);
+    // Get user details from Clerk
+    const user = await clerkClient.users.getUser(userId);
+    const userDetails = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.emailAddresses[0]?.emailAddress || "No email provided",
+    };
 
-    // Update the hospital with the Clerk user data (if needed)
     const updatedHospital = await Hospital.findByIdAndUpdate(
       id,
-      { ...req.body, clerkUserId: userId }, // Optionally store the Clerk user ID
+      {
+        ...req.body,
+        clerkUserId: userId,
+        clerkUserDetails: userDetails, // Store simplified user details
+      },
       { new: true }
     );
 
+    if (!updatedHospital) {
+      return res.status(404).json({
+        success: false,
+        message: "Hospital not found",
+      });
+    }
+
     res.status(200).json({ success: true, data: updatedHospital });
   } catch (error) {
-    console.log("error: " + error.message);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Clerk/Database Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
+
+// ... existing code ...
 
 export const deleteHospital = async (req, res) => {
   const { id } = req.params;
