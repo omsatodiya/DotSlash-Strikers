@@ -1,32 +1,51 @@
 import React from 'react'
 import ItemCard from '../Components/itemCards'
+import { useState, useEffect } from 'react';
+
 const Market = () => {
-    const items = [{
-        imageUrl: "https://picsum.photos/200/300",
-        id:1243,
-        name: "Medical Equipment Name",
-        quantity: 100,
-        price: 1000,
-        expiryDate: "2024-12-31",
-        hospitalName: "City General Hospital",
-        description: "Detailed description of the medical equipment or medicine..."
-    } ,
-    {
-        imageUrl: "https://picsum.photos/200/300",
-        name: "Medical Equipment Name",
-        id: 2432,
-        quantity: 100,
-        price: 1000,
-        expiryDate: "2024-12-31",
-        hospitalName: "City General Hospital",
-        description: "lorem Detailed description of the medical equipment or medicine..."
+
+    const [itemData, setItemData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    useEffect(() => {
+      fetch("http://localhost:5500/api/item")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("network response wasn't ok")
+        }
+        console.log(response);
+        return response.json();
+      })
+      .then((data) => {
+        setItemData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
+    }, []);
+  
+    if(loading) {
+      return <>
+      loading
+      </>
     }
-    ]
+  
+    if(error) {
+      return <>
+      loading
+      </>
+    }
+
     return (
+        
         <>
+        {console.log(itemData)}
             <div className="h-[72px]"></div> 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4">
-  {items.map(item => (
+  {itemData.map(item => (
     <ItemCard key={item._id} item={item} />
   ))}
 </div>
@@ -35,3 +54,4 @@ const Market = () => {
 }
 
 export default Market
+
