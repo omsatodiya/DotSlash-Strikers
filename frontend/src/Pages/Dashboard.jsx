@@ -2,117 +2,346 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Building2,
-  PackagePlus,
-  ShoppingCart,
   MapPin,
   Phone,
   Mail,
   Clock,
+  PackagePlus,
+  ShoppingCart,
+  Activity,
+  Package,
+  Users,
+  TrendingUp,
 } from "lucide-react";
+import EditItemModal from "../Components/EditItemModal";
+import toast, { Toaster } from "react-hot-toast";
 
 function Dashboard() {
   const [hospitalData, setHospitalData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [myItems, setMyItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Fetch hospital data
   useEffect(() => {
-    // Fetch hospital data
-    const fetchHospitalData = async () => {
-      try {
-        const response = await fetch("/api/hospital/");
-        const data = await response.json();
-        setHospitalData(data);
-      } catch (error) {
-        console.error("Error fetching hospital data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHospitalData();
+    fetch("http://localhost:5000/api/hospital/64f1a2b3c5e1f2a3b4c5d6e7")
+      .then((response) => response.json())
+      .then((response) => {
+        console.log("Fetched hospital data:", response);
+        setHospitalData(response.data);
+      })
+      .catch((error) => console.error("Error fetching hospital data:", error));
   }, []);
 
-  if (loading) {
+  // Fetch hospital's items
+  useEffect(() => {
+    if (hospitalData?._id) {
+      fetch("http://localhost:5000/api/item")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Fetched all items:", data);
+          const hospitalItems = data.filter(
+            (item) => item.hospitalId === hospitalData._id
+          );
+          console.log("Filtered hospital items:", hospitalItems);
+          setMyItems(hospitalItems);
+        })
+        .catch((error) => console.error("Error fetching items:", error));
+    }
+  }, [hospitalData]);
+
+  const handleDeleteItem = async (itemId) => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/item/${itemId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (response.ok) {
+          setMyItems(myItems.filter((item) => item._id !== itemId));
+          toast.success("Item deleted successfully");
+        } else {
+          throw new Error("Failed to delete item");
+        }
+      } catch (error) {
+        toast.error("Error deleting item");
+        console.error("Error:", error);
+      }
+    }
+  };
+
+  const handleEditClick = (item) => {
+    setSelectedItem(item);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateItem = async (updatedItemData) => {
+    try {
+      const itemToUpdate = {
+        ...updatedItemData,
+        hospitalId: hospitalData._id,
+      };
+
+      const response = await fetch(
+        `http://localhost:5000/api/item/${selectedItem._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(itemToUpdate),
+        }
+      );
+
+      if (response.ok) {
+        const updatedItem = await response.json();
+        setMyItems(
+          myItems.map((item) =>
+            item._id === selectedItem._id ? updatedItem : item
+          )
+        );
+        setIsEditModalOpen(false);
+        toast.success("Item updated successfully");
+      } else {
+        throw new Error("Failed to update item");
+      }
+    } catch (error) {
+      toast.error("Error updating item");
+      console.error("Error:", error);
+    }
+  };
+
+  if (!hospitalData) {
     return (
-      <div className="flex justify-center items-center h-screen text-lg">
-        Loading...
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
+  const formatLocation = (location) => {
+    if (location?.coordinates) {
+      return `${location.coordinates[1]}, ${location.coordinates[0]}`;
+    }
+    return "Location not available";
+  };
+
   return (
-    <div className="p-6  bg-gray-100 min-h-screen">
-      {/* Header */}
-      <div className="mb-6 mt-10">
-        <h1 className="text-3xl font-bold text-gray-900">Hospital Dashboard</h1>
-        <p className="text-gray-600">Welcome back, {hospitalData?.name}</p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <Toaster position="top-right" />
 
-      {/* Buttons */}
-      <div className="flex gap-4 mb-6">
-        <Link
-          to="/add-item"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
-        >
-          <PackagePlus size={18} /> Add New Item
-        </Link>
-        <Link
-          to="/buy-item"
-          className="px-4 py-2 bg-green-600 text-white rounded-lg flex items-center gap-2 hover:bg-green-700"
-        >
-          <ShoppingCart size={18} /> Buy Items
-        </Link>
-      </div>
-
-      {/* Info Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white p-4 shadow-md rounded-lg flex items-center gap-4">
-          <Building2 className="text-blue-600" size={24} />
-          <div>
-            <p className="text-gray-500">Hospital Name</p>
-            <h3 className="text-lg font-semibold">{hospitalData?.name}</h3>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 shadow-md rounded-lg flex items-center gap-4">
-          <MapPin className="text-green-600" size={24} />
-          <div>
-            <p className="text-gray-500">Location</p>
-            <h3 className="text-lg font-semibold">
-              {`${hospitalData?.location?.coordinates[1]}, ${hospitalData?.location?.coordinates[0]}`}
-            </h3>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 shadow-md rounded-lg flex items-center gap-4">
-          <Phone className="text-orange-600" size={24} />
-          <div>
-            <p className="text-gray-500">Contact</p>
-            <h3 className="text-lg font-semibold">{hospitalData?.contact}</h3>
+      {/* Top Stats Section */}
+      <div className="bg-white shadow-sm ">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ">
+          <div className="md:flex md:items-center md:justify-between mt-14">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                Welcome back, {hospitalData.name}
+              </h2>
+              <div className="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
+                <div className="mt-2 flex items-center text-sm text-gray-500">
+                  <Building2 className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+                  Hospital Dashboard
+                </div>
+                <div className="mt-2 flex items-center text-sm text-gray-500">
+                  <Clock className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+                  {new Date(hospitalData.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Contact Information */}
-      <div className="bg-white p-4 shadow-md rounded-lg">
-        <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
-        <div className="mt-2 space-y-2">
-          <div className="flex items-center gap-2">
-            <Mail className="text-gray-500" size={18} />
-            <span>{hospitalData?.email}</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Link
+              to="/add-item"
+              className="bg-white overflow-hidden shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-300 ease-in-out"
+            >
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                  <PackagePlus className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-base font-medium text-gray-900">Add Item</p>
+                  <p className="text-sm text-gray-500">Add new medical supplies</p>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              to="/market"
+              className="bg-white overflow-hidden shadow rounded-lg p-6 hover:shadow-md transition-shadow duration-300 ease-in-out"
+            >
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-green-500 rounded-md p-3">
+                  <ShoppingCart className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-base font-medium text-gray-900">Market</p>
+                  <p className="text-sm text-gray-500">Browse available items</p>
+                </div>
+              </div>
+            </Link>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                  <Package className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-base font-medium text-gray-900">Total Items</p>
+                  <p className="text-sm text-gray-500">{myItems.length} items listed</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                  <Activity className="h-6 w-6 text-white" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-base font-medium text-gray-900">Status</p>
+                  <p className="text-sm text-gray-500">Active</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Phone className="text-gray-500" size={18} />
-            <span>{hospitalData?.contact}</span>
+        </div>
+
+        {/* Hospital Information */}
+        <div className="mb-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Hospital Information</h3>
+          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <Building2 className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Hospital Name</p>
+                    <p className="mt-1 text-sm text-gray-900">{hospitalData.name}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <Mail className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Email Address</p>
+                    <p className="mt-1 text-sm text-gray-900">{hospitalData.email}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <Phone className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Contact Number</p>
+                    <p className="mt-1 text-sm text-gray-900">{hospitalData.contact}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <MapPin className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Location</p>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {formatLocation(hospitalData.location)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <Clock className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Member Since</p>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {new Date(hospitalData.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="text-gray-500" size={18} />
-            <span>
-              Member since:{" "}
-              {new Date(hospitalData?.createdAt).toLocaleDateString()}
-            </span>
+        </div>
+
+        {/* My Listed Items */}
+        <div className="mt-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">My Listed Items</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {myItems.map((item) => (
+              <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="p-4">
+                  <h4 className="text-xl font-semibold mb-2">{item.name}</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Price:</span>
+                      <span className="font-medium">₹{item.price}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Quantity:</span>
+                      <span className="font-medium">{item.quantity}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Category:</span>
+                      <span className="font-medium">{item.category}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Status:</span>
+                      <span className="font-medium">{item.status}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Expiry:</span>
+                      <span className="font-medium">
+                        {new Date(item.expiryDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={() => handleEditClick(item)}
+                      className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteItem(item._id)}
+                      className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && (
+        <EditItemModal
+          item={selectedItem}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleUpdateItem}
+        />
+      )}
     </div>
   );
 }

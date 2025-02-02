@@ -73,10 +73,10 @@ const Market = () => {
         // Sort items
         switch (sortOrder) {
             case 'price-asc':
-                filteredItems.sort((a, b) => b.price - a.price);
+                filteredItems.sort((a, b) => a.price - b.price);
                 break;
             case 'price-desc':
-                filteredItems.sort((a, b) => a.price - b.price);
+                filteredItems.sort((a, b) => b.price - a.price);
                 break;
             case 'date':
                 filteredItems.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));

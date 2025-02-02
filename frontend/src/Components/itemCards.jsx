@@ -6,6 +6,25 @@ import { MoreVertical, X, Calendar, Building2 } from "lucide-react";
 const ItemCard = ({ item }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    const [hospitalName, setHospitalName] = useState('');
+
+    // Add hospital name fetch effect
+    useEffect(() => {
+        const fetchHospitalName = async () => {
+            try {
+                const response = await fetch(`/api/hospital/${item.hospitalID}`);
+                const data = await response.json();
+                setHospitalName(data.name);
+            } catch (error) {
+                console.error('Error fetching hospital name:', error);
+                setHospitalName('Unknown Hospital');
+            }
+        };
+
+        if (item.hospitalID) {
+            fetchHospitalName();
+        }
+    }, [item.hospitalID]);
 
     // Add scroll lock effect
     useEffect(() => {
@@ -43,18 +62,18 @@ const ItemCard = ({ item }) => {
 
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
-          case 'available':
-            return 'bg-green-100 text-green-800';
-          case 'low stock':
-            return 'bg-yellow-100 text-yellow-800';
-          case 'out of stock':
-            return 'bg-red-100 text-red-800';
-          case 'reserved':
-            return 'bg-purple-100 text-purple-800';
-          default:
-            return 'bg-gray-100 text-gray-800';
+            case 'available':
+                return 'bg-green-100 text-green-800';
+            case 'low stock':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'out of stock':
+                return 'bg-red-100 text-red-800';
+            case 'reserved':
+                return 'bg-purple-100 text-purple-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
         }
-      };
+    };
 
     return (
         <>
@@ -67,7 +86,6 @@ const ItemCard = ({ item }) => {
                         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center overflow-y-auto"
                         onClick={() => setIsExpanded(false)}
                     >
-                        {/* Add inner div to prevent click propagation on card content */}
                         <div onClick={(e) => e.stopPropagation()} className="min-h-full w-full flex items-center justify-center p-4">
                             <motion.div
                                 variants={cardVariants}
@@ -81,10 +99,7 @@ const ItemCard = ({ item }) => {
                                         onClick={() => setIsExpanded(!isExpanded)}
                                         className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
                                     >
-                                        {isExpanded ?
-                                            <X className="w-5 h-5 text-sky-900" /> :
-                                            <MoreVertical className="w-5 h-5 text-sky-900" />
-                                        }
+                                        <X className="w-5 h-5 text-sky-900" />
                                     </button>
                                 </div>
 
@@ -93,6 +108,11 @@ const ItemCard = ({ item }) => {
                                     <h3 className="text-xl font-semibold text-sky-900">{item.name}</h3>
 
                                     <div className="mt-2 space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sky-700">Price:</span>
+                                            <span className="font-medium">₹{item.price}</span>
+                                        </div>
+
                                         <div className="flex justify-between items-center">
                                             <span className="text-sky-700">Available:</span>
                                             <span className="font-medium">{item.quantity} units</span>
@@ -130,29 +150,34 @@ const ItemCard = ({ item }) => {
                                             </div>
                                         </div>
 
-                                        {isExpanded && (
-                                            <motion.div
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                className="space-y-3 mt-4 pt-4 border-t"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="w-5 h-5 text-sky-500" />
-                                                    <span className="text-sky-700">Expiry Date:</span>
-                                                    <span className="font-medium">{formatDate(item.expiryDate)}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Building2 className="w-5 h-5 text-sky-500" />
-                                                    <span className="text-sky-700">Status:</span>
-                                                    <span className={`font-medium capitalize px-3 py-1 rounded-full text-sm ${getStatusColor(item.status)}`}>
-                                                        {item.status}
-                                                    </span>
-                                                </div>
-                                            </motion.div>
-                                        )}
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            className="space-y-3 mt-4 pt-4 border-t"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Building2 className="w-5 h-5 text-sky-500" />
+                                                <span className="text-sky-700">Hospital:</span>
+                                                <span className="font-medium">{hospitalName}</span>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <Calendar className="w-5 h-5 text-sky-500" />
+                                                <span className="text-sky-700">Expiry Date:</span>
+                                                <span className="font-medium">{formatDate(item.expiryDate)}</span>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <Building2 className="w-5 h-5 text-sky-500" />
+                                                <span className="text-sky-700">Status:</span>
+                                                <span className={`font-medium capitalize px-3 py-1 rounded-full text-sm ${getStatusColor(item.status)}`}>
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                        </motion.div>
 
                                         {/* Action Buttons */}
-                                        <div className={`flex gap-3 mt-4 ${isExpanded ? 'pt-4 border-t' : ''}`}>
+                                        <div className="flex gap-3 mt-4 pt-4 border-t">
                                             <button className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-2 rounded-md transition-colors">
                                                 Buy
                                             </button>
@@ -189,8 +214,18 @@ const ItemCard = ({ item }) => {
 
                         <div className="mt-2 space-y-2">
                             <div className="flex justify-between items-center">
+                                <span className="text-sky-700">Price:</span>
+                                <span className="font-medium">₹{item.price}</span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
                                 <span className="text-sky-700">Available:</span>
                                 <span className="font-medium">{item.quantity} units</span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <span className="text-sky-700">Hospital:</span>
+                                <span className="font-medium truncate ml-2">{hospitalName}</span>
                             </div>
 
                             {/* Quantity selector */}
@@ -238,4 +273,5 @@ const ItemCard = ({ item }) => {
         </>
     );
 };
+
 export default ItemCard;
