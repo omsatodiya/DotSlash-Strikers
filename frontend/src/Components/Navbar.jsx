@@ -15,7 +15,7 @@ function Navbar() {
   const controls = useAnimation();
 
   useEffect(() => {
-    return scrollY.onChange((latest) => {
+    return scrollY.on("change",(latest) => {
       if (latest > 50) {
         controls.start("scroll");
       } else {

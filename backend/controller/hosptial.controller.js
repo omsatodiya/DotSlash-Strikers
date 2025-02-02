@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 export const getHospitals = async (req, res) => {
   try {
     const hospitals = await Hospital.find({});
-    res.status(200).json({ success: true, data: hospitals });
+    res.status(200).json({ success: true, data: hospitals, here: "here" });
   } catch (error) {
     console.log("error: " + error.message);
     res.status(500).json({ success: false, message: "Server error" });
@@ -26,7 +26,7 @@ export const createHospital = async (req, res) => {
   const newHospital = new Hospital(hospital);
   try {
     await newHospital.save();
-    res.status(201).json({ success: true, data: newHospital });
+    res.status(201).json({ success: true  , data: newHospital });
   } catch (error) {
     console.log("error: " + error.message);
     res.status(500).json({ success: false, message: "Server error" });

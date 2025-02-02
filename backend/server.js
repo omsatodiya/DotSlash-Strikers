@@ -16,15 +16,15 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 // Routes
-app.use("/api/hospital", HospitalRoutes);
-app.use("/api/item", ItemRoutes);
+app.use("/api/hospital",  HospitalRoutes);
+app.use("/api/item",  ItemRoutes);
 // ... existing code ...
 
 // Home route
@@ -120,7 +120,7 @@ app.post("/api/fun", async (req, res) => {
 })
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   connectDB();
   console.log(`Server is running on port ${PORT}`);

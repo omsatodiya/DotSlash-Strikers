@@ -11,7 +11,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", getHospitals);
+router.get("/",  getHospitals);
 
 router.get("/:id", getHospitalById);
 

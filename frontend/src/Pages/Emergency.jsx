@@ -1,100 +1,148 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
-import L from "leaflet"; // Import Leaflet for custom icons
+import { useNavigate } from "react-router-dom";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Sample locations array (latitude, longitude, and name for each marker)
-const locations = [
-  { lat: 21.1702, lon: 72.8311, name: "Location 1", id: "1" }, // Example location 1
-  { lat: 23.7041, lon: 71.1025, name: "Location 2", id: "2" }, // Example location 2
-  { lat: 20.7128, lon: 74.0060, name: "Location 3", id: "3" }, // Example location 3
-];
-
-// Your location
+// Your location (you might want to get this from browser's geolocation)
 const myLocation = { lat: 21.1702, lon: 72.8311, name: "My Location" };
 
 const MapComponent = () => {
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
+  const [hospitalData, setHospitalData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Custom icon for your location (using a different color)
+  // Fetch hospital data
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        const response = await fetch('http://localhost:5500/api/hospital');
+        if (!response.ok) {
+          throw new Error('Failed to fetch hospitals');
+        }
+        const data = await response.json();
+        console.log("Raw Hospital Data:", data); // Log raw data
+        
+        // Extract all hospitals and their coordinates (no limit to 5)
+        const hospitals = data.data.map((hospital) => {
+          const [longitude, latitude] = hospital.location.coordinates; // Extract coordinates
+          return {
+            id: hospital._id,
+            name: hospital.name,
+            latitude: latitude,
+            longitude: longitude,
+            contact: hospital.email,
+            address: hospital.address, // Assuming address exists
+          };
+        });
+
+        // Log each hospital's coordinates
+        hospitals.forEach((hospital) => {
+          console.log(`Hospital: ${hospital.name} | Coordinates: Lat: ${hospital.latitude}, Lon: ${hospital.longitude}`);
+        });
+
+        setHospitalData(hospitals);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching hospitals:", err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchHospitals();
+  }, []);
+
+  // Custom icon for your location (unique color - red)
   const myLocationIcon = new L.DivIcon({
     className: "my-location-icon",
-    html: <div style="background-color:red; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white;"></div>, // Custom red circle
-    iconSize: [25, 25], // Size of the icon
+    html: `<div style="background-color: red; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white;"></div>`,
+    iconSize: [30, 30],
   });
 
-  // Default icon for other locations (using Leaflet's default icon)
-  const defaultIcon = new L.Icon({
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png", // Default Leaflet marker icon
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png", // Shadow for the marker
-    shadowSize: [41, 41],
+  // Shared default icon for hospitals (same color)
+  const sharedIcon = new L.DivIcon({
+    className: "shared-location-icon",
+    html: `<div style="background-color: blue; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white;"></div>`,
+    iconSize: [30, 30],
   });
 
-  // Function to handle the redirection when clicking on a location marker
-  const handleMarkerClick = (locationId) => {
-    // Navigate to a different route based on locationId (e.g., /location/:id)
-    navigate(`/location/${locationId}`);
+  const handleMarkerClick = (hospitalId) => {
+    navigate(`/hospital/${hospitalId}`);
   };
 
+  if (loading) {
+    return <div>Loading hospitals...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      <h1>Map Showing Multiple Locations</h1>
+    <div className="h-screen w-screen">
+      <div className="p-4 bg-white">
+        <h1>Nearby Hospitals</h1>
+      </div>
 
       <MapContainer
-        center={[myLocation.lat, myLocation.lon]} // Default center to your location
-        zoom={5} // Adjust zoom level as needed
-        style={{ width: "100%", height: "400px" }}
+        center={[myLocation.lat, myLocation.lon]}
+        zoom={12}
+        style={{ width: "100%", height: "calc(100% - 100px)" }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
-        {/* Marker for your location with a custom icon */}
+        {/* Your location marker */}
         <Marker
-          key="my-location"
           position={[myLocation.lat, myLocation.lon]}
           icon={myLocationIcon}
-          title={myLocation.name} // Title will appear on hover
         >
-          <Popup>{myLocation.name}</Popup>
+          <Popup>Your Location</Popup>
         </Marker>
 
-        {/* Loop through other locations and add markers for each */}
-        {locations.map((location, index) => (
-          <Marker
-            key={index}
-            position={[location.lat, location.lon]}
-            icon={defaultIcon}
-            eventHandlers={{
-              click: () => handleMarkerClick(location.id), // Call the handler when the marker is clicked
-            }}
-          >
-            {/* Tooltip with custom card-style appearance */}
-            <Tooltip
-              direction="top"
-              offset={[0, -30]} // Adjust the offset so it appears above the marker
-              permanent
-              className="custom-tooltip"
+        {/* Hospital markers */}
+        {hospitalData.length > 0 ? (
+          hospitalData.map((hospital) => (
+            <Marker
+              key={hospital.id}
+              position={[hospital.latitude, hospital.longitude]}
+              icon={sharedIcon} // Same color for hospital markers
+              eventHandlers={{
+                click: () => handleMarkerClick(hospital.id),
+              }}
             >
-              <div style={tooltipStyle}>
-                <h3>{location.name}</h3>
-              </div>
-            </Tooltip>
+              <Tooltip
+                direction="top"
+                offset={[0, -30]}
+                permanent
+                className="custom-tooltip"
+              >
+                <div style={tooltipStyle}>
+                  <h3>{hospital.name}</h3>
+                </div>
+              </Tooltip>
 
-            <Popup>{location.name}</Popup>
-          </Marker>
-        ))}
+              <Popup>
+                <div>
+                  <h3>{hospital.name}</h3>
+                  <p>Contact: {hospital.contact}</p>
+                  <p>Address: {hospital.address}</p>
+                </div>
+              </Popup>
+            </Marker>
+          ))
+        ) : (
+          <div>No hospitals available to display</div>
+        )}
       </MapContainer>
     </div>
   );
 };
 
-// Custom tooltip card style
 const tooltipStyle = {
   backgroundColor: "#fff",
   border: "1px solid #ddd",

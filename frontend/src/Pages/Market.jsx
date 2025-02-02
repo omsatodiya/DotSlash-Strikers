@@ -3,98 +3,98 @@ import ItemCard from '../Components/itemCards';
 import { useState, useEffect } from 'react';
 
 const Market = () => {
-    const [itemData, setItemData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [filter, setFilter] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [sortOrder, setSortOrder] = useState('price-asc');
+        const [itemData, setItemData] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
+        const [filter, setFilter] = useState('');
+        const [searchQuery, setSearchQuery] = useState('');
+        const [sortOrder, setSortOrder] = useState('price-asc');
 
-    // Fetch data from API with search query
-    useEffect(() => {
-        const fetchItems = async () => {
-            try {
-                let url = 'http://localhost:5000/api/item';
-                if (searchQuery) {
-                    url += `/search?query=${encodeURIComponent(searchQuery)}`;
+        // Fetch data from API with search query
+        useEffect(() => {
+            const fetchItems = async () => {
+                try {
+                    let url = 'http://localhost:5500/api/item';
+                    if (searchQuery) {
+                        url += `/search?query=${encodeURIComponent(searchQuery)}`;
+                    }
+                    
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch items');
+                    }
+                    const data = await response.json();
+                    setItemData(data);
+                    setLoading(false);
+                } catch (err) {
+                    setError(err.message);
+                    setLoading(false);
                 }
-                
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch items');
-                }
-                const data = await response.json();
-                setItemData(data);
-                setLoading(false);
-            } catch (err) {
-                setError(err.message);
-                setLoading(false);
-            }
+            };
+
+            // Add debounce to prevent too many API calls
+            const timeoutId = setTimeout(() => {
+                fetchItems();
+            }, 300);
+
+            return () => clearTimeout(timeoutId);
+        }, [searchQuery]);
+
+        // Handle filter change
+        const handleFilterChange = (event) => {
+            setFilter(event.target.value);
         };
 
-        // Add debounce to prevent too many API calls
-        const timeoutId = setTimeout(() => {
-            fetchItems();
-        }, 300);
+        // Handle search change
+        const handleSearchChange = (event) => {
+            setSearchQuery(event.target.value);
+        };
 
-        return () => clearTimeout(timeoutId);
-    }, [searchQuery]);
+        // Handle sort change
+        const handleSortChange = (event) => {
+            setSortOrder(event.target.value);
+        };
 
-    // Handle filter change
-    const handleFilterChange = (event) => {
-        setFilter(event.target.value);
-    };
+        // Get unique categories from itemData
+        const getUniqueCategories = () => {
+            const categories = [...new Set(itemData.map(item => item.category))];
+            return categories;
+        };
 
-    // Handle search change
-    const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value);
-    };
+        // Filter and sort function
+        const getFilteredAndSortedItems = () => {
+            let filteredItems = [...itemData];
 
-    // Handle sort change
-    const handleSortChange = (event) => {
-        setSortOrder(event.target.value);
-    };
+            // Filter by category
+            if (filter) {
+                filteredItems = filteredItems.filter(item => item.category === filter);
+            }
 
-    // Get unique categories from itemData
-    const getUniqueCategories = () => {
-        const categories = [...new Set(itemData.map(item => item.category))];
-        return categories;
-    };
+            // Sort items
+            switch (sortOrder) {
+                case 'price-asc':
+                    filteredItems.sort((a, b) => b.price - a.price);
+                    break;
+                case 'price-desc':
+                    filteredItems.sort((a, b) => a.price - b.price);
+                    break;
+                case 'date':
+                    filteredItems.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                    break;
+                default:
+                    break;
+            }
 
-    // Filter and sort function
-    const getFilteredAndSortedItems = () => {
-        let filteredItems = [...itemData];
+            return filteredItems;
+        };
 
-        // Filter by category
-        if (filter) {
-            filteredItems = filteredItems.filter(item => item.category === filter);
+        if (loading) {
+            return <div>Loading...</div>;
         }
 
-        // Sort items
-        switch (sortOrder) {
-            case 'price-asc':
-                filteredItems.sort((a, b) => b.price - a.price);
-                break;
-            case 'price-desc':
-                filteredItems.sort((a, b) => a.price - b.price);
-                break;
-            case 'date':
-                filteredItems.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-                break;
-            default:
-                break;
+        if (error) {
+            return <div>Error: {error}</div>;
         }
-
-        return filteredItems;
-    };
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
 
     return (
         <div className="flex flex-col lg:flex-row">
