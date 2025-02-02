@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import { useNavigate } from "react-router-dom";
 
 
 // Button Component Implementation
@@ -87,9 +88,95 @@ const cardVariant = {
   }
 };
 
+const getCurrentLocation = () => {
+    setLocationLoading(true);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setFormData((prev) => ({
+            ...prev,
+            location: {
+              type: "Point",
+              coordinates: [
+                position.coords.longitude,
+                position.coords.latitude,
+              ],
+            },
+          }));
+          setLocationLoading(false);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setError(
+            "Failed to get location. Please enter coordinates manually."
+          );
+          setLocationLoading(false);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by your browser");
+      setLocationLoading(false);
+    }
+  };
+
+
 export default function Home() {
   const [ref1, inView1] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [ref2, inView2] = useInView({ triggerOnce: true, threshold: 0.1 });
+  const navigate = useNavigate();
+
+  const handleEmergencyClick = () => {
+    if ("geolocation" in navigator) {
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Log the location coordinates
+          console.log("Current Location:", {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+
+          navigate('/emergency', {
+            state: {
+              location: {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              }
+            }
+          });
+        },
+        (error) => {
+          let errorMessage = "";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Please enable location permissions in your browser settings to use this feature.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Location information is unavailable. Please try again.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Location request timed out. Please try again.";
+              break;
+            default:
+              errorMessage = "An unknown error occurred while getting location.";
+          }
+          console.error("Geolocation error:", errorMessage);
+          
+          alert(errorMessage);
+          navigate('/emergency');
+        },
+        options
+      );
+    } else {
+      alert("Geolocation is not supported by your browser");
+      navigate('/emergency');
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -124,6 +211,7 @@ export default function Home() {
                 size="lg" 
                 variant="outline" 
                 className="border-red-700 text-red-800 hover:bg-red-200 transform hover:scale-105 transition-all"
+                onClick={handleEmergencyClick}
               >
                 Emergency Call 
               </Button>

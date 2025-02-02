@@ -12,6 +12,7 @@ import Home from "./Pages/Home";
 import Market from "./Pages/Market";
 import { useState, useEffect } from "react";
 import { Route , Routes , BrowserRouter } from "react-router-dom";
+import Emergency from "./Pages/Emergency";
 function App() {
   const { isSignedIn } = useUser();
 
@@ -20,7 +21,7 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-      fetch("http://localhost:5500/api/hospital")
+      fetch("http://localhost:5000/api/hospital")
       .then((response) => {
         if (!response.ok) {
           throw new Error("network response wasn't ok")
@@ -57,6 +58,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/market" element={<Market />} />
+        <Route path="/Emergency" element={<Emergency />} />
       </Routes>
       <Footer/>
       {/* <h1>Welcome to My App</h1> */}
