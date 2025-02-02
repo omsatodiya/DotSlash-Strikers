@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, useScroll, useAnimation } from "framer-motion";
-import { HeartPulse, Menu, X } from "lucide-react";
+import { HeartPulse, Menu, User, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   SignedIn,
   SignUpButton,
   SignedOut,
   UserButton,
+  SignInButton,
 } from "@clerk/clerk-react";
 
 function Navbar() {
@@ -109,13 +110,12 @@ function Navbar() {
                 {item.name}
               </Link>
             ))}
-            <Link
-              to="/signin"
-              className="block w-full px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md text-center transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              Sign In
-            </Link>
+            <SignedOut>
+              <SignInButton/>
+            </SignedOut>
+            <SignedIn>
+              <UserButton/> 
+            </SignedIn>
           </div>
         </motion.div>
       </div>

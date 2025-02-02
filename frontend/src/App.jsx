@@ -10,10 +10,11 @@ import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import Home from "./Pages/Home";
 import Market from "./Pages/Market";
+import { useState, useEffect } from "react";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
+import Emergency from "./Pages/Emergency";
 import Dashboard from "./Pages/Dashboard";
-import HospitalRegistrationForm from "./Components/HospitalForm";
-import { useEffect, useState } from "react";
+import AddItemForm from "./Components/AddItem";
 function App() {
   const { isSignedIn } = useUser();
 
@@ -55,8 +56,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/market" element={<Market />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/hospital-form" element={<HospitalRegistrationForm />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard hospitalData={hospitalData} />}
+        />
+        <Route path="/emergency" element={<Emergency />} />
+        <Route path="/add-item" element={<AddItemForm />} />
       </Routes>
       <Footer />
       {/* <h1>Welcome to My App</h1> */}

@@ -1,6 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-const MarketSidebar = () => {
+const MarketSidebar = ({ onFilterChange, onSortChange }) => {
     return (
         <div className="lg:w-64 lg:h-[calc(100vh-72px)] lg:fixed lg:top-[72px] lg:left-0 lg:border-r lg:border-gray-200 bg-white w-full sticky top-[72px] z-10">
             <div className="flex lg:flex-col lg:p-4 p-2 overflow-x-auto lg:overflow-y-auto gap-4 items-center lg:items-stretch">
@@ -16,8 +16,11 @@ const MarketSidebar = () => {
                 {/* Filter Section */}
                 <div className="lg:mb-6 min-w-[150px] lg:min-w-0 flex-1 lg:flex-none">
                     <h3 className="font-semibold mb-2 hidden lg:block">Filter By</h3>
-                    <select className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Category</option>
+                    <select
+                        onChange={(e) => onFilterChange(e.target.value)}
+                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="">All Categories</option>
                         <option value="equipment">Equipment</option>
                         <option value="medicine">Medicine</option>
                         <option value="supplies">Supplies</option>
@@ -27,7 +30,10 @@ const MarketSidebar = () => {
                 {/* Sort Section */}
                 <div className="lg:mb-6 min-w-[150px] lg:min-w-0 flex-1 lg:flex-none">
                     <h3 className="font-semibold mb-2 hidden lg:block">Sort By</h3>
-                    <select className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select
+                        onChange={(e) => onSortChange(e.target.value)}
+                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
                         <option value="price-asc">Price: Low to High</option>
                         <option value="price-desc">Price: High to Low</option>
                         <option value="date">Date Added</option>
@@ -42,7 +48,7 @@ const MarketSidebar = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default MarketSidebar
+export default MarketSidebar;

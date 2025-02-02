@@ -98,6 +98,32 @@ const cardVariant = {
   },
 };
 
+const getCurrentLocation = () => {
+  setLocationLoading(true);
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            type: "Point",
+            coordinates: [position.coords.longitude, position.coords.latitude],
+          },
+        }));
+        setLocationLoading(false);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        setError("Failed to get location. Please enter coordinates manually.");
+        setLocationLoading(false);
+      }
+    );
+  } else {
+    setError("Geolocation is not supported by your browser");
+    setLocationLoading(false);
+  }
+};
+
 export default function Home() {
   const { isSignedIn, isLoaded } = useAuth();
   const [ref1, inView1] = useInView({ triggerOnce: true, threshold: 0.1 });
@@ -166,6 +192,7 @@ export default function Home() {
                   </Button>
                 </Link>
               )}
+
               <Link to="/emergency">
                 <Button
                   size="lg"
