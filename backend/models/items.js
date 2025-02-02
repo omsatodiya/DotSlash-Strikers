@@ -11,6 +11,8 @@ const itemSchema = new mongoose.Schema({
     required: true,
   },
   status: { type: String, default: "available" },
+  price: { type: Number, required: true },
+  imageURL: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 

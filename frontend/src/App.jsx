@@ -24,7 +24,7 @@ function App() {
       fetch("http://localhost:5000/api/hospital")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("network response wasn't ok")
+          throw new Error("network response wasn't ok");
         }
         // console.log(response);
         return response.json();
@@ -37,19 +37,15 @@ function App() {
         setError(error.message);
         setLoading(false);
       });
-    }, []);
+  }, []);
 
-    if(loading) {
-      return <>
-      loading
-      </>
-    }
-  
-    if(error) {
-      return <>
-      loading
-      </>
-    }
+  if (loading) {
+    return <>loading</>;
+  }
+
+  if (error) {
+    return <>loading</>;
+  }
 
   return (
     <div>
@@ -60,9 +56,8 @@ function App() {
         <Route path="/market" element={<Market />} />
         <Route path="/Emergency" element={<Emergency />} />
       </Routes>
-      <Footer/>
+      <Footer />
       {/* <h1>Welcome to My App</h1> */}
-
     </div>
   );
 }
