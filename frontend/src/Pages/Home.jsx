@@ -166,14 +166,16 @@ export default function Home() {
                   </Button>
                 </Link>
               )}
+              <Link to="/emergency">
+                <Button
+                  size="lg"
+                  className="border-red-700 text-red-800 hover:bg-red-200 hover:cursor-pointer transform hover:scale-105 transition-all"
+                >
+                  Emergency
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
 
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-red-700 text-red-800 hover:bg-red-200 hover:cursor-pointer transform hover:scale-105 transition-all"
-              >
-                Emergency Call
-              </Button>
               {/* <Link to="/hospital-form">
                 <Button
                   size="lg"

@@ -13,6 +13,7 @@ import Market from "./Pages/Market";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Dashboard from "./Pages/Dashboard";
 import HospitalRegistrationForm from "./Components/HospitalForm";
+import { useEffect, useState } from "react";
 function App() {
   const { isSignedIn } = useUser();
 
@@ -21,7 +22,7 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5500/api/hospital")
+    fetch("http://localhost:5000/api/hospital")
       .then((response) => {
         if (!response.ok) {
           throw new Error("network response wasn't ok");

@@ -79,6 +79,18 @@ export const createItem = async (req, res) => {
     req.body;
 
   try {
+    if (
+      !name ||
+      !quantity ||
+      !expiryDate ||
+      !category ||
+      !hospitalId ||
+      !imageURL ||
+      !price
+    ) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
     const newItem = new Item({
       name,
       quantity,
@@ -87,13 +99,17 @@ export const createItem = async (req, res) => {
       hospitalId,
       imageURL,
       price,
+      status: "available", // Default status
     });
+
     await newItem.save();
     res
       .status(201)
       .json({ message: "Item created successfully", item: newItem });
   } catch (err) {
-    res.status(500).json({ error: "Error creating item" });
+    res
+      .status(500)
+      .json({ error: "Error creating item", details: err.message });
   }
 };
 
@@ -130,29 +146,5 @@ export const deleteItem = async (req, res) => {
     res.status(200).json({ message: "Item deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: "Error deleting item" });
-  }
-};
-
-export const addItem = async (req, res) => {
-  const { name, quantity, expiryDate, category, hospitalId } = req.body;
-
-  try {
-    if (!name || !quantity || !expiryDate || !category || !hospitalId) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-
-    const newItem = new Item({
-      name,
-      quantity,
-      expiryDate,
-      category,
-      hospitalId,
-    });
-
-    await newItem.save();
-
-    res.status(201).json({ message: "Item added successfully", item: newItem });
-  } catch (err) {
-    res.status(500).json({ error: "Error adding item" });
   }
 };
