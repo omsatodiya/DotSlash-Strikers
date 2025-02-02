@@ -11,8 +11,10 @@ import Footer from "./Components/Footer";
 import Home from "./Pages/Home";
 import Market from "./Pages/Market";
 import { useState, useEffect } from "react";
-import { Route , Routes , BrowserRouter } from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Emergency from "./Pages/Emergency";
+import Dashboard from "./Pages/Dashboard";
+import AddItemForm from "./Components/AddItem";
 function App() {
   const { isSignedIn } = useUser();
 
@@ -21,7 +23,7 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-      fetch("http://localhost:5000/api/hospital")
+    fetch("http://localhost:5000/api/hospital")
       .then((response) => {
         if (!response.ok) {
           throw new Error("network response wasn't ok");
@@ -54,7 +56,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/market" element={<Market />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard hospitalData={hospitalData} />}
+        />
         <Route path="/emergency" element={<Emergency />} />
+        <Route path="/add-item" element={<AddItemForm />} />
       </Routes>
       <Footer />
       {/* <h1>Welcome to My App</h1> */}
