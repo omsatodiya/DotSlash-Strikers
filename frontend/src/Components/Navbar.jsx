@@ -40,7 +40,7 @@ function Navbar() {
     { name: "Home", href: "/" },
     { name: "Marketplace", href: "/market" },
     { name: "About", href: "/about" },
-    { name: "Support", href: "/support" },
+    { name: "Emergency", href: "/emergency" },
   ];
 
   return (
@@ -55,7 +55,7 @@ function Navbar() {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <HeartPulse className="h-8 w-8 text-sky-500" />
-            <span className="text-xl font-bold text-sky-900">MedExchange</span>
+            <span className="text-xl font-bold text-sky-900">MedShare</span>
           </Link>
 
           {/* Desktop Menu */}

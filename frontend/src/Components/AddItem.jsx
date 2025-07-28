@@ -10,7 +10,7 @@ function AddItemForm() {
     category: '',
     price: '',
     imageURL: '',
-    hospitalId: '64f1a2b3c5e1f2a3b4c5d6e7', // Your specific hospital ID
+    hospitalId: '688476eb0bbfcff41fa4f8b7', // Your specific hospital ID
     status: 'available'
   });
 

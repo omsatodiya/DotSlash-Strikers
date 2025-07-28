@@ -15,6 +15,7 @@ import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Emergency from "./Pages/Emergency";
 import Dashboard from "./Pages/Dashboard";
 import AddItemForm from "./Components/AddItem";
+import AboutUs from "./Pages/About";
 function App() {
   const { isSignedIn } = useUser();
 
@@ -50,7 +51,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col relative">
       <Navbar />
       {console.log(hospitalData)}
       <Routes>
@@ -62,6 +63,7 @@ function App() {
         />
         <Route path="/emergency" element={<Emergency />} />
         <Route path="/add-item" element={<AddItemForm />} />
+        <Route path="/about" element={<AboutUs />} />
       </Routes>
       <Footer />
       {/* <h1>Welcome to My App</h1> */}

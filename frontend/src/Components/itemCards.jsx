@@ -8,7 +8,6 @@ const ItemCard = ({ item }) => {
     const [quantity, setQuantity] = useState(1);
     const [hospitalName, setHospitalName] = useState('');
 
-    // Add hospital name fetch effect
     useEffect(() => {
         const fetchHospitalName = async () => {
             try {
@@ -26,15 +25,12 @@ const ItemCard = ({ item }) => {
         }
     }, [item.hospitalID]);
 
-    // Add scroll lock effect
     useEffect(() => {
         if (isExpanded) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
         }
-
-        // Cleanup function
         return () => {
             document.body.style.overflow = 'unset';
         };
@@ -51,7 +47,6 @@ const ItemCard = ({ item }) => {
         }
     };
 
-    // Format the date to be more readable
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -92,8 +87,13 @@ const ItemCard = ({ item }) => {
                                 animate={isExpanded ? "expanded" : "normal"}
                                 className="relative bg-white rounded-xl shadow-lg overflow-y-auto max-h-[90vh] w-[80%] max-w-xl z-50"
                             >
-                                {/* Card Header */}
-                                <div className="relative h-32 bg-sky-100 flex items-center justify-center">
+                                {/* Expanded Card Header with Background Image */}
+                                <div
+                                    className="relative h-32 flex items-center justify-center bg-sky-100 bg-cover bg-center"
+                                    style={{
+                                        backgroundImage: item.imageURL ? `url("${item.imageURL}")` : "none"
+                                    }}
+                                >
                                     <span className="text-2xl font-semibold text-sky-900">{item.category}</span>
                                     <button
                                         onClick={() => setIsExpanded(!isExpanded)}
@@ -103,7 +103,7 @@ const ItemCard = ({ item }) => {
                                     </button>
                                 </div>
 
-                                {/* Card Content */}
+                                {/* Expanded Card Content */}
                                 <div className="p-4">
                                     <h3 className="text-xl font-semibold text-sky-900">{item.name}</h3>
 
@@ -118,7 +118,7 @@ const ItemCard = ({ item }) => {
                                             <span className="font-medium">{item.quantity} units</span>
                                         </div>
 
-                                        {/* Quantity selector */}
+                                        {/* Quantity Selector */}
                                         <div className="flex justify-between items-center">
                                             <span className="text-sky-700">Select:</span>
                                             <div className="flex items-center gap-2">
@@ -176,7 +176,6 @@ const ItemCard = ({ item }) => {
                                             </div>
                                         </motion.div>
 
-                                        {/* Action Buttons */}
                                         <div className="flex gap-3 mt-4 pt-4 border-t">
                                             <button className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-2 rounded-md transition-colors">
                                                 Buy
@@ -190,15 +189,20 @@ const ItemCard = ({ item }) => {
                 )}
             </AnimatePresence>
 
-            {/* Normal card view */}
+            {/* Collapsed Card View */}
             {!isExpanded && (
                 <motion.div
                     variants={cardVariants}
                     animate="normal"
                     className="relative bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-[280px]"
                 >
-                    {/* Card Header */}
-                    <div className="relative h-32 bg-sky-100 flex items-center justify-center">
+                    {/* Collapsed Header with Background Image */}
+                    <div
+                        className="relative h-32 flex items-center justify-center bg-sky-100 bg-cover bg-center"
+                        style={{
+                            backgroundImage: item.imageURL ? `url("${item.imageURL}")` : "none"
+                        }}
+                    >
                         <span className="text-2xl font-semibold text-sky-900">{item.category}</span>
                         <button
                             onClick={() => setIsExpanded(true)}
@@ -208,7 +212,7 @@ const ItemCard = ({ item }) => {
                         </button>
                     </div>
 
-                    {/* Card Content */}
+                    {/* Collapsed Content */}
                     <div className="p-4">
                         <h3 className="text-xl font-semibold text-sky-900">{item.name}</h3>
 
@@ -228,7 +232,6 @@ const ItemCard = ({ item }) => {
                                 <span className="font-medium truncate ml-2">{hospitalName}</span>
                             </div>
 
-                            {/* Quantity selector */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sky-700">Select:</span>
                                 <div className="flex items-center gap-2">
@@ -260,7 +263,6 @@ const ItemCard = ({ item }) => {
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
                             <div className="flex gap-3 mt-4">
                                 <button className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-2 rounded-md transition-colors">
                                     Buy

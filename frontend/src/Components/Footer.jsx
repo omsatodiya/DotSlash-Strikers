@@ -18,7 +18,7 @@ function Footer() {
     const [ref3, inView3] = useInView({ triggerOnce: true, threshold: 0.1 });
 
     return (
-        <footer className="bg-gradient-to-b from-white to-sky-50 py-16 mt-auto" ref={ref3}>
+        <footer className="bg-gradient-to-b from-white to-sky-50 py-16 mt-auto z-50" ref={ref3}>
             <motion.div
                 initial="hidden"
                 animate={inView3 ? "visible" : "hidden"}
@@ -49,23 +49,23 @@ function Footer() {
                     <div>
                         <h3 className="font-semibold mb-4 text-sky-900">About</h3>
                         <ul className="space-y-3">
-                            <li><Link to="/mission" className="text-sky-700 hover:text-sky-500 transition-colors">Our Mission</Link></li>
-                            <li><Link to="/how-it-works" className="text-sky-700 hover:text-sky-500 transition-colors">How It Works</Link></li>
-                            <li><Link to="/team" className="text-sky-700 hover:text-sky-500 transition-colors">Team</Link></li>
+                            <li><Link to="/about" className="text-sky-700 hover:text-sky-500 transition-colors">Our Mission</Link></li>
+                            <li><Link to="/about" className="text-sky-700 hover:text-sky-500 transition-colors">How It Works</Link></li>
+                            <li><Link to="/about" className="text-sky-700 hover:text-sky-500 transition-colors">Team</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h3 className="font-semibold mb-4 text-sky-900">Resources</h3>
                         <ul className="space-y-3">
-                            <li><Link to="/faq" className="text-sky-700 hover:text-sky-500 transition-colors">FAQ</Link></li>
-                            <li><Link to="/support" className="text-sky-700 hover:text-sky-500 transition-colors">Support</Link></li>
+                            <li><Link to="/about" className="text-sky-700 hover:text-sky-500 transition-colors">FAQ</Link></li>
+                            <li><Link to="/about" className="text-sky-700 hover:text-sky-500 transition-colors">Support</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h3 className="font-semibold mb-4 text-sky-900">Legal</h3>
                         <ul className="space-y-3">
-                            <li><Link to="/terms" className="text-sky-700 hover:text-sky-500 transition-colors">Terms of Service</Link></li>
-                            <li><Link to="/contact" className="text-sky-700 hover:text-sky-500 transition-colors">Contact</Link></li>
+                            <li><Link to="/about" className="text-sky-700 hover:text-sky-500 transition-colors">Terms of Service</Link></li>
+                            <li><Link to="/about" className="text-sky-700 hover:text-sky-500 transition-colors">Contact</Link></li>
                         </ul>
                     </div>
                 </div>
