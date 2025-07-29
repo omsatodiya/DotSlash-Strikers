@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, useScroll, useAnimation } from "framer-motion";
-import { HeartPulse, Menu, User, X } from "lucide-react";
+import { HeartPulse, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  SignedIn,
-  SignUpButton,
-  SignedOut,
-  UserButton,
-  SignInButton,
-} from "@clerk/clerk-react";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +9,7 @@ function Navbar() {
   const controls = useAnimation();
 
   useEffect(() => {
-    return scrollY.on("change",(latest) => {
+    return scrollY.on("change", (latest) => {
       if (latest > 50) {
         controls.start("scroll");
       } else {
@@ -70,13 +63,12 @@ function Navbar() {
               </Link>
             ))}
 
-            <SignedOut>
-              <SignUpButton className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors" />
-            </SignedOut>
-
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
+            <Link
+              to="/dashboard"
+              className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors"
+            >
+              Dashboard
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -110,12 +102,14 @@ function Navbar() {
                 {item.name}
               </Link>
             ))}
-            <SignedOut>
-              <SignInButton/>
-            </SignedOut>
-            <SignedIn>
-              <UserButton/> 
-            </SignedIn>
+
+            <Link
+              to="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors"
+            >
+              Dashboard
+            </Link>
           </div>
         </motion.div>
       </div>
